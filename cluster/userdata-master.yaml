@@ -289,6 +289,7 @@ write_files:
           # - --authorization-mode=RBAC,Webhook
           # - --authorization-webhook-config-file=/etc/kubernetes/config/authz.yaml
           - --admission-control-config-file=/etc/kubernetes/config/image-policy-webhook.yaml
+          - --runtime-config=authorization.k8s.io/v1beta1=true
           - --feature-gates=ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true
           - --anonymous-auth=false
           # TODO: remove - view RBAC denies
@@ -316,7 +317,7 @@ write_files:
             readOnly: true
           - mountPath: /etc/kubernetes/config
             name: kubernetes-configs
-            readOnly: true
+            readOnly: false
           resources:
             requests:
               cpu: 100m
@@ -615,6 +616,7 @@ write_files:
   - path: /etc/kubernetes/config/tokenfile.csv
     content: |
       {{WORKER_SHARED_SECRET}},kubelet,kubelet
+      {{CONTROLLER_MANAGER_SECRET}},system:kube-controller-manager,system:kube-controller-manager
 
   - path: /etc/kubernetes/config/image-policy-webhook.yaml
     permissions: 0644
