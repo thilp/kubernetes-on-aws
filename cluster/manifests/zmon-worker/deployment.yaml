@@ -17,10 +17,10 @@ spec:
         iam.amazonaws.com/role: "{{ .LocalID }}-app-zmon"
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
+      serviceAccountName: zmon
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists
-
       initContainers:
       - name: gerry-init
         image: registry.opensource.zalan.do/teapot/gerry:v0.0.14
@@ -40,7 +40,6 @@ spec:
           - name: credentials
             mountPath: /meta/credentials
             readOnly: false
-
       containers:
         - name: zmon-worker
           image: "pierone.stups.zalan.do/stups/zmon-worker:zv228"

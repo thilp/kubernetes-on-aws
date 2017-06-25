@@ -39,7 +39,7 @@ spec:
                     values:
                     - kube-dns-b
                 topologyKey: kubernetes.io/hostname
-      serviceAccountName: system
+      serviceAccountName: kube-dns
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists

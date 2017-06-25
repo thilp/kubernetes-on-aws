@@ -285,11 +285,14 @@ write_files:
           - --authentication-token-webhook-config-file=/etc/kubernetes/config/authn.yaml
           - --authentication-token-webhook-cache-ttl=10s
           - --cloud-provider=aws
-          - --authorization-mode=Webhook
-          - --authorization-webhook-config-file=/etc/kubernetes/config/authz.yaml
+          - --authorization-mode=RBAC
+          # - --authorization-mode=RBAC,Webhook
+          # - --authorization-webhook-config-file=/etc/kubernetes/config/authz.yaml
           - --admission-control-config-file=/etc/kubernetes/config/image-policy-webhook.yaml
           - --feature-gates=ExperimentalCriticalPodAnnotation=true,TaintBasedEvictions=true
           - --anonymous-auth=false
+          # TODO: remove - view RBAC denies
+          - --v=2
           livenessProbe:
             httpGet:
               host: 127.0.0.1
@@ -319,6 +322,9 @@ write_files:
               cpu: 100m
               memory: 200Mi
         - image: registry.opensource.zalan.do/teapot/k8s-authnz-webhook:v0.3.8
+            limits:
+              cpu: 200m
+              memory: 1Gi
           name: webhook
           ports:
           - containerPort: 8081
@@ -348,7 +354,7 @@ write_files:
             - name: TOKEN_INTROSPECTION_URL
               value: http://127.0.0.1:9021/oauth2/introspect
             - name: USER_GROUPS
-              value: stups_autobahn=Administrator,stups_deployment-controller-ui=ReadOnly,credentials-provider=Administrator,credprov-kube-ops-view-read-only-token=ReadOnly,credprov-cluster-lifecycle-manager-cluster-rw-token=Administrator,credprov-cluster-lifecycle-manager-test-cluster-rw-token=Administrator,credprov-cdp-controller-cluster-token=PowerUser,credprov-api-discovery-k8s-cluster-read-only-token=ReadOnly,stups_zmon-zmon=ReadOnly
+              value: stups_autobahn=Administrator,stups_deployment-controller-ui=ReadOnly,credentials-provider=Administrator,credprov-kube-ops-view-read-only-token=ReadOnly,credprov-cluster-lifecycle-manager-cluster-rw-token=system:masters,credprov-cluster-lifecycle-manager-test-cluster-rw-token=Administrator,credprov-cdp-controller-cluster-token=PowerUser,credprov-api-discovery-k8s-cluster-read-only-token=ReadOnly,stups_zmon-zmon=ReadOnly
             - name: BUSINESS_PARTNER_IDS
               value: {{ APISERVER_BUSINESS_PARTNER_IDS }}
           volumeMounts:
@@ -604,7 +610,7 @@ write_files:
           token: ${token}
       EOF
 
-      echo "${token},kube-controller-manager,kube-controller-manager" >> /etc/kubernetes/config/tokenfile.csv
+      echo "${token},system:kube-controller-manager,system:kube-controller-manager" >> /etc/kubernetes/config/tokenfile.csv
 
   - path: /etc/kubernetes/config/tokenfile.csv
     content: |
