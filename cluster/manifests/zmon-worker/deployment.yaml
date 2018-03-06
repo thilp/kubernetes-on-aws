@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: zmon-worker
@@ -12,7 +12,7 @@ spec:
     metadata:
       labels:
         application: zmon-worker
-        version: "zv228"
+        version: "v190-zv244"
       annotations:
         iam.amazonaws.com/role: "{{ .LocalID }}-app-zmon"
         scheduler.alpha.kubernetes.io/critical-pod: ''
@@ -42,7 +42,7 @@ spec:
             readOnly: false
       containers:
         - name: zmon-worker
-          image: "pierone.stups.zalan.do/stups/zmon-worker:zv228"
+          image: "pierone.stups.zalan.do/zmon/zmon-worker:v190-zv244"
           resources:
             limits:
               cpu: 500m

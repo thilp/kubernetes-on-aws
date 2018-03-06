@@ -1,11 +1,11 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: zmon-scheduler
   namespace: kube-system
   labels:
     application: zmon-scheduler
-    version: "v43"
+    version: "v45-zv147"
 spec:
   replicas: 1
   selector:
@@ -15,7 +15,7 @@ spec:
     metadata:
       labels:
         application: zmon-scheduler
-        version: "v43"
+        version: "v45-zv147"
       annotations:
         iam.amazonaws.com/role: "{{ .LocalID }}-app-zmon"
         scheduler.alpha.kubernetes.io/critical-pod: ''
@@ -47,7 +47,7 @@ spec:
 
       containers:
         - name: zmon-scheduler
-          image: "registry.opensource.zalan.do/stups/zmon-scheduler:v43"
+          image: "pierone.stups.zalan.do/zmon/zmon-scheduler:v45-zv147"
           resources:
             limits:
               cpu: 2
@@ -93,7 +93,7 @@ spec:
               value: "6379"
 
             - name: SCHEDULER_ENTITY_BASE_FILTER_STR
-              value: '[{"infrastructure_account":"{{ .InfrastructureAccount }}","region":"{{ .Region }}"}]'
+              value: '[{"infrastructure_account":"{{ .InfrastructureAccount }}","region":"{{ .Region }}"{{ if eq .Alias "db" }}, "kube_cluster":"{{ .ID }}"{{ end }}}]'
             - name: SCHEDULER_INSTANT_EVAL_HTTP_URL
               value: https://data-service.zmon.zalan.do/api/v1/instant-evaluations/kube-cluster[{{ .InfrastructureAccount }}:{{ .Region }}]/
             - name: SCHEDULER_TRIAL_RUN_HTTP_URL

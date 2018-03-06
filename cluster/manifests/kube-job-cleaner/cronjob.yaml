@@ -5,7 +5,7 @@ metadata:
   namespace: kube-system
   labels:
     application: kube-job-cleaner
-    version: "0.3"
+    version: "0.4-1"
 spec:
   schedule: "17 * * * *"
   concurrencyPolicy: Forbid
@@ -17,7 +17,7 @@ spec:
         metadata:
           labels:
             application: kube-job-cleaner
-            version: "0.3"
+            version: "0.4-1"
         spec:
           serviceAccountName: system
           restartPolicy: Never
